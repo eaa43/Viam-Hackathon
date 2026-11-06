@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "note": "Workflow snapshot from Viam. Hardware identity, network addresses, and camera serial numbers intentionally omitted.",
+  "custom_modules": {
+    "hackathons:105c9f30-1770-4abb-8731-af686ca355bc": "code-1 (v0.0.2)",
+    "hackathons:404121c6-ed45-489c-8f7d-eba4bb8e99b1": "mail-address-reader (v0.0.8)",
+    "hackathons:a0c3a692-38ff-4b20-9714-f549cca1af24": "sorter (v0.0.4)",
+    "hackathons:5d314490-f1b4-45bd-a4d8-4296e9622caf": "code-2 (v0.0.2)",
+    "hackathons:80afae66-e74b-4bd2-a075-22d8e5baef8b": "mail-handler (v0.0.5)",
+    "hackathons:42606b52-e245-497f-aec9-d0423cc1fcf5": "main orchestrator (v0.0.2)"
+  },
+  "service_settings": {
+    "code-1": {
+      "switch": "home-pose"
+    },
+    "mail-address-reader": {
+      "camera": "cam",
+      "pose_switch": "mail-reader-pose",
+      "settle_s": 1
+    },
+    "sorter": {
+      "reader": "mail-address-reader"
+    },
+    "code-2": {
+      "approach_mm": 100,
+      "arm": "arm",
+      "camera": "cam",
+      "gripper": "gripper",
+      "lift_mm": 200,
+      "max_attempts": 3,
+      "min_grasp_z_mm": 60,
+      "segmenter": "object-segmenter",
+      "settle_s": 1,
+      "slow_speed_degs": 5,
+      "sweep": {
+        "start_deg": -30,
+        "end_deg": 30,
+        "step_deg": 15
+      },
+      "travel_speed_degs": 10
+    },
+    "color-detector": {
+      "camera_name": "cam",
+      "detect_color": "#FF5CC8",
+      "hue_tolerance_pct": 0.25,
+      "label": "letter",
+      "segment_size_px": 2000
+    },
+    "object-segmenter": {
+      "camera_name": "cam",
+      "detector_name": "color-detector",
+      "infer_minimum_depth": true,
+      "mean_k": 5,
+      "sigma": 0.5
+    },
+    "mail-handler": {
+      "arm": "arm",
+      "gripper": "gripper",
+      "gripper_pose": "mail-gripper-pose",
+      "pick_x_offset_mm": -100,
+      "reader_pose": "mail-reader-pose",
+      "switch": "mail-handle-pose",
+      "y_offset_mm": 50,
+      "z_offset_mm": 20
+    },
+    "green-detector": {
+      "camera_name": "cam",
+      "detect_color": "#00A651",
+      "hue_tolerance_pct": 0.12,
+      "label": "green-bin",
+      "saturation_cutoff_pct": 0.3,
+      "segment_size_px": 5000,
+      "value_cutoff_pct": 0.2
+    },
+    "green-segmenter": {
+      "camera_name": "cam",
+      "detector_name": "green-detector",
+      "infer_minimum_depth": true,
+      "mean_k": 5,
+      "sigma": 0.5
+    },
+    "main": {
+      "arm": "arm",
+      "bin_pose": "bins-view-pose",
+      "bin_y_offset_mm": 50,
+      "gripper": "gripper",
+      "mail_handler": "mail-handler",
+      "reader": "mail-address-reader",
+      "reader_pose": "mail-reader-pose",
+      "sorter": "sorter",
+      "sort_section": "receiver",
+      "sort_field": "address",
+      "sort_condition": "Boston"
+    }
+  },
+  "saved_pose_joints_rad": {
+    "mail-handle-pose": [
+      0.6958083,
+      -0.08062334,
+      -0.50621063,
+      0.16959883,
+      -0.43118674,
+      -1.01744151
+    ],
+    "mail-reader-pose": [
+      1.46851635,
+      -0.79492539,
+      -1.30863416,
+      0.11275401,
+      -0.46700895,
+      1.45649612
+    ],
+    "letter-edge-pose": [
+      1.4268049,
+      -0.64410943,
+      -0.89924961,
+      0.25511456,
+      -0.21452542,
+      0.99701017
+    ],
+    "mail-gripper-pose": [
+      1.81591368,
+      -0.96063262,
+      -1.22133088,
+      -1.57148743,
+      -0.7846303,
+      1.57157457
+    ],
+    "bins-view-pose": [
+      1.11175621,
+      -0.71678883,
+      -1.63780057,
+      0.08293934,
+      -0.89426118,
+      1.14807248
+    ]
+  },
+  "workflow": [
+    "main: handle_mail (mail-handler)",
+    "move to mail-reader-pose",
+    "read_mail and extract recipient/address",
+    "sort using receiver/address; condition Boston",
+    "pick_mail and lift 200 mm",
+    "move to bins-view-pose",
+    "offset Y by +50 mm for group A or -50 mm otherwise",
+    "release mail"
+  ]
+}
